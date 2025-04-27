@@ -88,7 +88,7 @@ This project is built with modularity in mind, making it easy to maintain, test,
 - **`game.combat`**: Manages all battle logic, including interfaces (`Combatant`, `MeleeFighter`, etc.), the main loop (`CombatSystem`), and battle summaries (`BattleResult`).
 
 ### 🖼️ Coming Soon: Graphical Interface (GUI)
-The code is written with separation of concerns, so GUI support will be added using JavaFX or Swing in future versions. The combat and game engine logic will remain reusable across both CLI and GUI modes.
+The code is written with separation of concerns and GUI support in future versions. The combat and game engine logic will remain reusable across both CLI and GUI modes.
 
 ---
 
