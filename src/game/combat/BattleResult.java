@@ -68,4 +68,31 @@ public class BattleResult {
         return dmgByEnemy;
     }
 
+    /**
+     * checks if the two battle results are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof BattleResult)) {
+            return false;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        BattleResult otherResult = (BattleResult) obj;
+        return this.enemyName == otherResult.enemyName && this.dmgByEnemy == otherResult.dmgByEnemy && this.dmgByPlayer == otherResult.dmgByPlayer && this.rounds == otherResult.rounds;
+    }
+
+
+    /**
+     * represents the class as string
+     */
+    @Override
+    public String toString(){
+        return "enemy name: " + enemyName + "number of rounds" + rounds;
+    }
+
 }

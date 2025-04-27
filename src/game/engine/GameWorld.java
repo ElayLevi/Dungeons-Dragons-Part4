@@ -6,6 +6,7 @@ import game.core.GameEntity;
 import game.items.GameItem;
 import game.items.Potion;
 import game.items.Treasure;
+import game.items.Wall;
 import game.map.GameMap;
 import java.util.*;
 
@@ -238,7 +239,7 @@ public class GameWorld {
             }
             case "3" -> {
                 for (GameItem item : items) {
-                    if (item.getVisible()) {
+                    if (item.getVisible() && !(item instanceof Wall)) {
                         if (player.getPosition().distanceTo(item.getPosition()) == 1) {
                             item.pickUp(player);
                             map.removeEntity(item);
