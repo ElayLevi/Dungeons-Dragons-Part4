@@ -7,7 +7,8 @@ import game.Model.characters.PlayerCharacter;
 import game.Util.SoundPlayer;
 
 import javax.swing.*;
-
+//Elay Levi - 207365073
+//Ori Avni - 318873932
 /**
  * Entry point for the D&D GUI application. Prompts the user for
  * player name, class, and map size, then displays the main window.

@@ -1,5 +1,4 @@
 package game.Model.engine;
-
 import game.Controller.GameObserver;
 import game.Model.characters.Enemy;
 import game.Model.characters.PlayerCharacter;
@@ -11,7 +10,9 @@ import game.Model.items.Treasure;
 import game.Model.map.GameMap;
 import game.Model.map.Position;
 import game.Util.SoundPlayer;
-
+import game.Model.characters.Goblin;
+import game.Model.characters.Orc;
+import game.Model.characters.Dragon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -136,11 +137,26 @@ public class GameWorld {
 
     public void attack(Enemy enemy) {
         PlayerCharacter player = players.get(0);
+
+
+        switch (player.getClass().getSimpleName()) {
+            case "Warrior" -> SoundPlayer.play("warrior_attack.wav");
+            case "Mage"    -> SoundPlayer.play("mage_attack.wav");
+            case "Archer"  -> SoundPlayer.play("archer_attack.wav");
+        }
+
+
         BattleResult result = CombatSystem.resolveCombat(player, enemy);
         battleResults.add(result);
 
         lastActionPos = enemy.getPosition();
         lastAction    = Action.COMBAT;
+
+        if (!enemy.isDead()) {
+            if (enemy instanceof Goblin)   SoundPlayer.play("goblin_attack.wav");
+            else if (enemy instanceof Orc) SoundPlayer.play("org_attack.wav");
+            else if (enemy instanceof Dragon) SoundPlayer.play("dragon_attack.wav");
+        }
 
         if (player.isDead()) {
             System.out.println("Game Over! " + player.getName() + " was defeated.");
@@ -148,6 +164,9 @@ public class GameWorld {
             notifyObservers();
             return;
         }
+
+
+
         if (enemy.isDead()) {
             System.out.println(enemy.enemyDiscription() + " defeated!");
             SoundPlayer.play("enemy_die.wav");
