@@ -78,14 +78,14 @@ This project is built with modularity in mind, making it easy to maintain, test,
 
 ### 🏗️ Package Breakdown
 
-- **`game.core`**: Contains essential interfaces and abstract components like `GameEntity` and `Inventory`. These serve as the foundation for all characters and items.
-- **`game.map`**: Implements the grid-based map system, including movement, visibility, and spatial logic using `GameMap` and `Position`.
-- **`game.items`**: Defines all interactive and non-interactive items such as `Potion`, `PowerPotion`, `Wall`, and `Treasure`, which inherit from `GameItem`.
-- **`game.characters`**: Includes all characters in the game:
+- **`game.Model.characters.core`**: Contains essential interfaces and abstract components like `GameEntity` and `Inventory`. These serve as the foundation for all characters and items.
+- **`game.Model.characters.map`**: Implements the grid-based map system, including movement, visibility, and spatial logic using `GameMap` and `Position`.
+- **`game.Model.characters.items`**: Defines all interactive and non-interactive items such as `Potion`, `PowerPotion`, `Wall`, and `Treasure`, which inherit from `GameItem`.
+- **`game.Model.characters`**: Includes all characters in the game:
   - `PlayerCharacter`: Base class for user-controlled heroes.
   - `Warrior`, `Mage`, `Archer`: Extend `PlayerCharacter`, implementing specialized behavior.
   - `Enemy`, `Goblin`, `Orc`, `Dragon`: Enemy types with varied combat logic.
-- **`game.combat`**: Manages all battle logic, including interfaces (`Combatant`, `MeleeFighter`, etc.), the main loop (`CombatSystem`), and battle summaries (`BattleResult`).
+- **`game.Model.characters.combat`**: Manages all battle logic, including interfaces (`Combatant`, `MeleeFighter`, etc.), the main loop (`CombatSystem`), and battle summaries (`BattleResult`).
 
 ### 🖼️ Coming Soon: Graphical Interface (GUI)
 The code is written with separation of concerns and GUI support in future versions. The combat and game engine logic will remain reusable across both CLI and GUI modes.
