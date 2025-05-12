@@ -15,7 +15,7 @@ import javax.swing.*;
 public class MainWindow {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            SoundPlayer.play("background_game_sound.mp3");
+
             // 1) Ask for player name
             String name = JOptionPane.showInputDialog(
                     null,
@@ -23,6 +23,7 @@ public class MainWindow {
                     "Dungeons & Dragons",
                     JOptionPane.PLAIN_MESSAGE
             );
+            SoundPlayer.play("background_game_sound.wav");
             if (name == null) {
                 // Cancel pressed: exit immediately
                 System.exit(0);

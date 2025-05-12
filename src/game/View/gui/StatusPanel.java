@@ -6,7 +6,6 @@ import game.Model.engine.GameWorld;
 import game.Model.characters.PlayerCharacter;
 
 /**
- * פאנל סטטוס: מציג את נתוני השחקן ומתעדכן כש־GameWorld משתנה.
  */
 public class StatusPanel extends JPanel implements GameObserver {
     private final GameWorld world;

@@ -101,7 +101,7 @@ public class GameWorld {
             player.addToInventory(item);
         } else if (item instanceof Treasure t) {
             player.updateTreasurePoint(t.getValue());
-            SoundPlayer.play("treasure_sound.mp3");
+            SoundPlayer.play("treasure-sound.wav");
         }
 
         lastActionPos = item.getPosition();
@@ -150,7 +150,7 @@ public class GameWorld {
         }
         if (enemy.isDead()) {
             System.out.println(enemy.enemyDiscription() + " defeated!");
-            SoundPlayer.play("enemy_die.mp3");
+            SoundPlayer.play("enemy_die.wav");
             Treasure loot = enemy.defeat();
             loot.setVisible(true);
             map.removeEntity(enemy);

@@ -18,7 +18,6 @@ public class BattleLogPanel extends JPanel implements GameObserver {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder("Battle Log"));
 
-        // הגדרת עמודות הטבלה
         String[] cols = { "Enemy", "Rounds", "Player Dmg", "Enemy Dmg" };
         model = new DefaultTableModel(cols, 0);
 
@@ -26,12 +25,10 @@ public class BattleLogPanel extends JPanel implements GameObserver {
         table.setFillsViewportHeight(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // הרשמה כ־Observer וטעינת כל התוצאות הקיימות
         world.registerObserver(this);
         loadExisting();
     }
 
-    // נטען בהפעלה ראשונית את כל התוצאות שכבר נמצאות ב־GameWorld
     private void loadExisting() {
         List<BattleResult> list = world.getBattleResults();
         for (BattleResult r : list) {
@@ -44,10 +41,8 @@ public class BattleLogPanel extends JPanel implements GameObserver {
         }
     }
 
-    // קורא פעם אחת עבור כל notifyObservers()
     @Override
     public void onModelChanged() {
-        // אם נוספו תוצאות חדשות – הוסף רק את ההפרש
         List<BattleResult> list = world.getBattleResults();
         if (list.size() > model.getRowCount()) {
             BattleResult r = list.get(list.size() - 1);
