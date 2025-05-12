@@ -8,13 +8,11 @@ import java.net.URL;
 public class SoundPlayer {
     public static void play(String filename) {
         AudioInputStream ais = null;
-        // קודם מה-classpath
         URL url = SoundPlayer.class.getClassLoader().getResource("sounds/" + filename);
         try {
             if (url != null) {
                 ais = AudioSystem.getAudioInputStream(url);
             } else {
-                // fallback למערכת הקבצים
                 File f = new File("src/game/Resources/sounds/" + filename);
                 if (!f.exists()) {
                     System.err.println("Sound not found anywhere: " + filename
