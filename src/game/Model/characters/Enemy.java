@@ -41,8 +41,6 @@ public abstract class Enemy extends AbstractCharacter implements Runnable {
     }
 
 
-
-
     /**
      * Returns the loot value that this enemy carries.
      */
