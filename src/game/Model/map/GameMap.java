@@ -1,10 +1,13 @@
 package game.Model.map;
 import game.Model.characters.*;
 import game.Model.core.GameEntity;
+import game.Model.engine.GameWorld;
 import game.Model.items.Potion;
 import game.Model.items.PowerPotion;
 import game.Model.items.Wall;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 
@@ -40,11 +43,13 @@ public class GameMap {
     private Map <Position, List<GameEntity>> grid;
     private int row;
     private int col;
+    private ReentrantLock mapLock = new ReentrantLock(true);
+
 
     /**
      * Constructs an empty GameMap.
      */
-    public GameMap(int row, int col, PlayerCharacter player) {
+    public GameMap(int row, int col, PlayerCharacter player, GameWorld world) {
         if (row < 10 || col < 10) {
             throw new IllegalArgumentException("Map must be at least 10x10");
         }
@@ -62,12 +67,16 @@ public class GameMap {
                 if (roll < 0.4) {
                     continue;
                 } else if (roll < 0.7) {
-                    GameEntity enemy = switch (rand.nextInt(3)) {
-                        case 0 -> new Goblin();
-                        case 1 -> new Orc();
-                        default -> new Dragon();
+                    Enemy enemy = switch (rand.nextInt(3)) {
+                        case 0 -> new Goblin(world);
+                        case 1 -> new Orc(world);
+                        default -> new Dragon(world);
                     };
-                    addEntity(pos, enemy);
+
+                    enemy.setPosition(pos);
+                    world.getEnemies().add(enemy);
+                    addEntity(pos,enemy);
+
                 } else if (roll < 0.8) {
                     // 10% chance to add a wall
                     addEntity(pos, new Wall(pos)); // assumes Wall also takes Position
@@ -98,33 +107,64 @@ public class GameMap {
 
     }
 
+    private boolean tryLockMap(long timeoutMS) {
+        try {
+            return mapLock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+
+    private void unlockMap() {
+        if (mapLock.isHeldByCurrentThread()) {
+            mapLock.unlock();
+        }
+    }
+
 
     /**
      * Adds a GameEntity to a specific position.
      *
      */
     public boolean addEntity(Position pos, GameEntity entity) {
-        if (pos == null || entity == null) return false;
-        grid.putIfAbsent(pos,new ArrayList<>());
-        grid.get(pos).add(entity);
-        entity.setPosition(pos);
-        return true;
+        if (!tryLockMap(200))
+            return false;
+        try {
+            if (pos == null || entity == null) return false;
+            grid.putIfAbsent(pos, new ArrayList<>());
+            grid.get(pos).add(entity);
+            entity.setPosition(pos);
+            return true;
+        }
+        finally {
+            unlockMap();
+        }
     }
 
     /**
      * Removes a GameEntity from its position.
      */
     public boolean removeEntity(GameEntity entity) {
-        if (entity == null || entity.getPosition() == null) return false;
-        Position pos = entity.getPosition();
-        List <GameEntity> entities = grid.get(pos);
-        if (entities != null && entities.remove(entity)) {
-            if (entities.isEmpty()) {
-                grid.remove(pos);
+        if (!tryLockMap(200))
+            return false;
+        try {
+            if (entity == null || entity.getPosition() == null) return false;
+            Position pos = entity.getPosition();
+            List<GameEntity> entities = grid.get(pos);
+            if (entities != null && entities.remove(entity)) {
+                if (entities.isEmpty()) {
+                    grid.remove(pos);
+                }
+                return true;
             }
-            return true;
+            return false;
         }
-        return false;
+        finally {
+            unlockMap();
+        }
     }
 
 
@@ -168,42 +208,48 @@ public class GameMap {
      * Moves a character to a position if possible
      */
     public boolean moveEntity(GameEntity entity, String direction) {
-        if (entity == null || direction == null || entity.getPosition() == null) {
+        if (!tryLockMap(200))
             return false;
-        }
-        if (!(entity instanceof PlayerCharacter)) {
-            return false;
-        }
-
-        Position current = entity.getPosition();
-        Position next = switch (direction.toLowerCase()) {
-            case "up"    -> new Position(current.getRow() - 1, current.getCol());
-            case "down"  -> new Position(current.getRow() + 1, current.getCol());
-            case "left"  -> new Position(current.getRow(),     current.getCol() - 1);
-            case "right" -> new Position(current.getRow(),     current.getCol() + 1);
-            default      -> null;
-        };
-        if (next == null) {
-            System.out.println("Invalid direction: " + direction);
-            return false;
-        }
-
-        // גבולות
-        if (next.getRow() < 0 || next.getRow() >= row ||
-                next.getCol() < 0 || next.getCol() >= col) {
-            System.out.println("Cannot move " + direction + ": outside map bounds!");
-            return false;
-        }
-
-        for (GameEntity e : getEntities(next)) {
-            if (e instanceof Wall || e instanceof Enemy) {
-                System.out.println("That space is blocked!");
+        try {
+            if (entity == null || direction == null || entity.getPosition() == null) {
                 return false;
             }
-        }
+            if (!(entity instanceof PlayerCharacter)) {
+                return false;
+            }
 
-        removeEntity(entity);
-        return addEntity(next, entity);
+            Position current = entity.getPosition();
+            Position next = switch (direction.toLowerCase()) {
+                case "up" -> new Position(current.getRow() - 1, current.getCol());
+                case "down" -> new Position(current.getRow() + 1, current.getCol());
+                case "left" -> new Position(current.getRow(), current.getCol() - 1);
+                case "right" -> new Position(current.getRow(), current.getCol() + 1);
+                default -> null;
+            };
+            if (next == null) {
+                System.out.println("Invalid direction: " + direction);
+                return false;
+            }
+
+            if (next.getRow() < 0 || next.getRow() >= row ||
+                    next.getCol() < 0 || next.getCol() >= col) {
+                System.out.println("Cannot move " + direction + ": outside map bounds!");
+                return false;
+            }
+
+            for (GameEntity e : getEntities(next)) {
+                if (e instanceof Wall || e instanceof Enemy) {
+                    System.out.println("That space is blocked!");
+                    return false;
+                }
+            }
+
+            removeEntity(entity);
+            return addEntity(next, entity);
+        }
+        finally {
+            unlockMap();
+        }
     }
 
     /**

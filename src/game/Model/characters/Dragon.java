@@ -1,6 +1,7 @@
 package game.Model.characters;
 import game.Model.characters.*;
 import game.Model.combat.*;
+import game.Model.engine.GameWorld;
 import game.Model.map.Position;
 import java.util.Objects;
 import java.util.Random;
@@ -37,8 +38,8 @@ public class Dragon extends Enemy implements MeleeFighter, PhysicalAttacker, Ran
     /**
      * constructs a dragon, with a random magic element
      */
-    public Dragon() {
-        super();
+    public Dragon(GameWorld world) {
+        super(world);
         MagicElement[] elements = MagicElement.values();
         this.element = elements[new java.util.Random().nextInt(elements.length)]; // randomizes the element of the dragon, based on the values in the magic element enum
     }
@@ -219,5 +220,36 @@ public class Dragon extends Enemy implements MeleeFighter, PhysicalAttacker, Ran
      */
     public String enemyDiscription() {
         return "Dragon";
+    }
+
+
+
+    public void enemyAction() {
+        PlayerCharacter player = getWorld().getPlayers().get(0);
+        Position playerPos = player.getPosition();
+        Position myPos = getPosition();
+        int distance = myPos.distanceTo(playerPos);
+        int attackeRange = 2;
+
+        if (distance <= attackeRange) {
+            getWorld().attack(this);
+        }
+        else {
+            Random rand = new Random();
+            if (rand.nextInt(100)<20) {
+                int dRow = Integer.compare(playerPos.getRow(), myPos.getRow());
+                int dCol = Integer.compare(playerPos.getCol(), myPos.getCol());
+                String direction;
+                if (Math.abs(playerPos.getRow() - myPos.getRow()) > Math.abs(playerPos.getCol() - myPos.getCol())) {
+                    direction = dRow > 0 ? "down" : "up";
+                }
+                else {
+                    direction = dCol > 0 ? "right" : "left";
+                }
+                if (getWorld().getMap().moveEntity(this, direction)) {
+                    getWorld().notifyObservers();
+                }
+            }
+        }
     }
 }

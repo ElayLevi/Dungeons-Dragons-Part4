@@ -1,18 +1,14 @@
 package game.View.gui;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.*;
 import java.util.List;
-
 import game.Controller.GameObserver;
-import game.Model.items.Potion;
-import game.Model.items.PowerPotion;
-import game.View.gui.BattleLogPanel;
 import game.Model.engine.GameWorld;
 import game.Model.items.GameItem;
 import game.Model.map.GameMap;
-import game.Model.map.Position;
 import game.Model.characters.*;
 import game.Controller.GameController;
 
@@ -20,14 +16,18 @@ public class MainPanel extends JPanel {
     public MainPanel(int rows, int cols, PlayerCharacter player) {
         super(new BorderLayout());
 
-        GameMap map = new GameMap(rows, cols, player);
 
         List<PlayerCharacter> players = List.of(player);
         List<Enemy> enemies = new ArrayList<>();
         List<GameItem> items = new ArrayList<>();
 
 
-        GameWorld world = GameWorld.getInstance(players, enemies, items, map);
+        GameWorld world = GameWorld.getInstance(players, enemies, items);
+
+        GameMap map = new GameMap(rows,cols,player,world);
+
+        world.setMap(map);
+
         world.registerObserver(new GameObserver() {
             @Override
             public void onModelChanged() {
@@ -57,8 +57,23 @@ public class MainPanel extends JPanel {
         add(statusPanel, BorderLayout.EAST);
         add(logPanel,    BorderLayout.SOUTH);
         add(inventoryPanel, BorderLayout.WEST);
+
+        world.startGame();
+
+        SwingUtilities.invokeLater(() -> {
+            Window window = SwingUtilities.getWindowAncestor(this);
+            if (window instanceof JFrame frame) {
+                frame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        world.stopGame();
+                    }
+                });
+            }
+        });
     }
-
-
 }
+
+
+
 

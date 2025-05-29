@@ -16,7 +16,14 @@ import game.Model.characters.Dragon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 /**
  * Represents the entire game state, including all players, enemies, items, and the map.
@@ -27,7 +34,7 @@ public class GameWorld {
     private final List<PlayerCharacter> players;
     private final List<Enemy>           enemies;
     private final List<GameItem>        items;
-    private final GameMap               map;
+    private  GameMap               map;
 
     private final List<BattleResult>    battleResults = new ArrayList<>();
     private final List<GameObserver>    observers     = new CopyOnWriteArrayList<>();
@@ -36,24 +43,32 @@ public class GameWorld {
     private Position lastActionPos;
     private Action   lastAction;
 
+    private final ScheduledExecutorService ses;
+    private  AtomicBoolean isRunning;
+    private final Random random = new Random();
+
+    private ReentrantLock worldLock = new ReentrantLock(true);
+
 
     private GameWorld(List<PlayerCharacter> players,
                       List<Enemy>           enemies,
-                      List<GameItem>        items,
-                      GameMap               map) {
+                      List<GameItem>        items) {
         this.players = players;
         this.enemies = enemies;
         this.items   = items;
-        this.map     = map;
+        this.map = null;
+        this.isRunning = new AtomicBoolean(false);
+        this.ses = Executors.newScheduledThreadPool(Math.min(enemies.size(), Runtime.getRuntime().availableProcessors()));
+
     }
+
 
 
     public static GameWorld getInstance(List<PlayerCharacter> players,
                                         List<Enemy>           enemies,
-                                        List<GameItem>        items,
-                                        GameMap               map) {
+                                        List<GameItem>        items) {
         if (instance == null) {
-            instance = new GameWorld(players, enemies, items, map);
+            instance = new GameWorld(players, enemies, items );
         }
         return instance;
     }
@@ -66,6 +81,49 @@ public class GameWorld {
             );
         }
         return instance;
+    }
+    public void setMap(GameMap map) {
+                if (this.map != null) throw new IllegalStateException("Map already set");
+                this.map = map;
+            }
+
+
+    public void startGame() {
+        isRunning.set(true);
+        for (Enemy e : enemies) {
+            scheduleEnemy(e, 500 + random.nextInt(1001));
+        }
+    }
+
+    private void scheduleEnemy(Enemy e, long delayMs) {
+        ses.schedule(() -> {
+            if (!isRunning.get()) return;
+
+            try {
+                e.run();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            scheduleEnemy(e, 500 + random.nextInt(1001));
+        }, delayMs, TimeUnit.MILLISECONDS);
+    }
+
+    public void stopGame() {
+        isRunning.set(false);
+        ses.shutdown();
+        try {
+            if (!ses.awaitTermination(2, TimeUnit.SECONDS)) {
+                ses.shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            ses.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public boolean isRunning() {
+        return isRunning.get();
     }
 
 
@@ -86,7 +144,7 @@ public class GameWorld {
     public void unregisterObserver(GameObserver o) {
         observers.remove(o);
     }
-    private void notifyObservers() {
+    public void notifyObservers() {
         observers.forEach(GameObserver::onModelChanged);
     }
 
@@ -136,6 +194,8 @@ public class GameWorld {
     }
 
     public void attack(Enemy enemy) {
+        if (!worldLock.tryLock()) return;
+        try {
         PlayerCharacter player = players.get(0);
 
 
@@ -166,7 +226,6 @@ public class GameWorld {
         }
 
 
-
         if (enemy.isDead()) {
             System.out.println(enemy.enemyDiscription() + " defeated!");
             SoundPlayer.play("enemy_die.wav");
@@ -181,31 +240,45 @@ public class GameWorld {
         map.revealNearby(player.getPosition());
         notifyObservers();
     }
+        finally {
+            worldLock.unlock();
+        }
+    }
 
     /**
      * Attempts to move the first player to `to`. Returns true if moved.
      */
     public boolean movePlayer(Position to) {
-        PlayerCharacter player = players.get(0);
-        Position from = player.getPosition();
-
-        String dir;
-        if      (to.getRow() == from.getRow() + 1 && to.getCol() == from.getCol()) dir = "down";
-        else if (to.getRow() == from.getRow() - 1 && to.getCol() == from.getCol()) dir = "up";
-        else if (to.getCol() == from.getCol() + 1 && to.getRow() == from.getRow()) dir = "right";
-        else if (to.getCol() == from.getCol() - 1 && to.getRow() == from.getRow()) dir = "left";
-        else return false;
-
-        boolean moved = map.moveEntity(player, dir);
-        if (moved) {
-            lastActionPos = to;
-            lastAction    = Action.MOVE;
-            map.revealNearby(player.getPosition());
-            SoundPlayer.play("footsteps.wav");
-            notifyObservers();
+        if (!worldLock.tryLock()) {
+            return false;
         }
-        return moved;
+        try {
+            PlayerCharacter player = players.get(0);
+            Position from = player.getPosition();
+
+            String dir;
+            if (to.getRow() == from.getRow() + 1 && to.getCol() == from.getCol()) dir = "down";
+            else if (to.getRow() == from.getRow() - 1 && to.getCol() == from.getCol()) dir = "up";
+            else if (to.getCol() == from.getCol() + 1 && to.getRow() == from.getRow()) dir = "right";
+            else if (to.getCol() == from.getCol() - 1 && to.getRow() == from.getRow()) dir = "left";
+            else return false;
+
+            boolean moved = map.moveEntity(player, dir);
+            if (moved) {
+                lastActionPos = to;
+                lastAction = Action.MOVE;
+                map.revealNearby(player.getPosition());
+                SoundPlayer.play("footsteps.wav");
+                notifyObservers();
+            }
+            return moved;
+
+        } finally {
+            worldLock.unlock();
+        }
     }
+
+
 
     @Override
     public String toString() {

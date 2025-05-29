@@ -6,7 +6,9 @@ import game.Model.combat.PhysicalAttacker;
 import game.Model.map.Position;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.locks.ReentrantLock;
 
+import game.Model.engine.GameWorld;
 
 /**
  * Represents a Goblin enemy in the game.
@@ -20,12 +22,14 @@ import java.util.Random;
 public class Goblin extends Enemy implements MeleeFighter, PhysicalAttacker {
 
     private int agility;
+    private ReentrantLock lock = new ReentrantLock();
+
 
     /**
      * constructs a goblin based on the Enemy default constructor with a random agility between 0-80
      */
-    public Goblin() {
-        super();
+    public Goblin(GameWorld world) {
+        super(world);
         this.agility = new Random().nextInt(81); // 0-80
     }
 
@@ -145,6 +149,39 @@ public class Goblin extends Enemy implements MeleeFighter, PhysicalAttacker {
      */
     public String enemyDiscription() {
         return "Goblin";
+    }
+
+    public void enemyAction() {
+
+
+            PlayerCharacter player = getWorld().getPlayers().get(0);
+            Position playerPos = player.getPosition();
+            Position myPos = getPosition();
+            int distance = myPos.distanceTo(playerPos);
+            int attackeRange = 1;
+
+            if (distance <= attackeRange) {
+                getWorld().attack(this);
+            }
+            else {
+                Random rand = new Random();
+                if (rand.nextInt(100)<20) {
+                    int dRow = Integer.compare(playerPos.getRow(), myPos.getRow());
+                    int dCol = Integer.compare(playerPos.getCol(), myPos.getCol());
+                    String direction;
+                    if (Math.abs(playerPos.getRow() - myPos.getRow()) > Math.abs(playerPos.getCol() - myPos.getCol())) {
+                        direction = dRow > 0 ? "down" : "up";
+                    }
+                    else {
+                        direction = dCol > 0 ? "right" : "left";
+                    }
+                    if (getWorld().getMap().moveEntity(this, direction)) {
+                        getWorld().notifyObservers();
+                    }
+                }
+            }
+
+
     }
 }
 

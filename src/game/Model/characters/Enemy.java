@@ -1,8 +1,9 @@
 package game.Model.characters;
+import game.Model.engine.GameWorld;
 import game.Model.items.Treasure;
 import java.util.Objects;
 import java.util.Random;
-
+import game.Model.map.Position;
 /**
  * Represents a non-player enemy character in the game.
  *
@@ -12,18 +13,34 @@ import java.util.Random;
  * It includes shared properties and behaviors such as loot generation and
  * defeat-handling mechanics.
  */
-public abstract class Enemy extends AbstractCharacter {
-
+public abstract class Enemy extends AbstractCharacter implements Runnable {
+    private GameWorld world;
     private int loot;
 
     /**
      * Constructs a new enemy with 50 health and randomized loot between 100 and 300.
      */
-    public Enemy() {
+    public Enemy(GameWorld world) {
         super();
         setHealth(50);
+        this.world = world;
         this.loot = new Random().nextInt(201) + 100; // 100–300
     }
+
+
+    @Override
+    public void run() {
+        try {
+            if (!world.isRunning()) {
+                return;
+            }
+            enemyAction();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
 
 
     /**
@@ -31,6 +48,10 @@ public abstract class Enemy extends AbstractCharacter {
      */
     public int getLoot() {
         return loot;
+    }
+
+    public GameWorld getWorld() {
+        return world;
     }
 
 
@@ -87,5 +108,7 @@ public abstract class Enemy extends AbstractCharacter {
     public String getName() {
         return enemyDiscription();
     }
+
+    public abstract void enemyAction();
 
 }
