@@ -9,6 +9,7 @@ import game.Model.items.Potion;
 import game.Model.items.Treasure;
 import game.Model.map.GameMap;
 import game.Model.map.Position;
+import game.Util.GameLogger;
 import game.Util.SoundPlayer;
 import game.Model.characters.Goblin;
 import game.Model.characters.Orc;
@@ -31,6 +32,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class GameWorld {
     private static GameWorld instance;
 
+    private boolean lastEvent = false;
+
     private final List<PlayerCharacter> players;
     private final List<Enemy>           enemies;
     private final List<GameItem>        items;
@@ -44,6 +47,7 @@ public class GameWorld {
     private Action   lastAction;
 
     private final ScheduledExecutorService ses;
+    private final ScheduledExecutorService WorldEventSchedualer;
     private  AtomicBoolean isRunning;
     private final Random random = new Random();
 
@@ -59,7 +63,11 @@ public class GameWorld {
         this.map = null;
         this.isRunning = new AtomicBoolean(false);
         this.ses = Executors.newScheduledThreadPool(Math.min(enemies.size(), Runtime.getRuntime().availableProcessors()));
-
+        this.WorldEventSchedualer = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "WorldEventThread");
+            t.setDaemon(true);
+            return t;
+        });
     }
 
 
@@ -82,17 +90,48 @@ public class GameWorld {
         }
         return instance;
     }
+
     public void setMap(GameMap map) {
-                if (this.map != null) throw new IllegalStateException("Map already set");
-                this.map = map;
-            }
+        if (this.map != null) throw new IllegalStateException("Map already set");
+        this.map = map;
+    }
+
+    public void gameEvent() {
+        lastEvent = true;
+
+        if (random.nextBoolean()) {
+            dmgMagicWave();
+            GameLogger.getInstance().log("A magic wave occurs that damaged everyone");
+        } else {
+            pwrMagicWave();
+            GameLogger.getInstance().log("A power wave occurs that raises everyone's power");
+        }
+
+        notifyObservers();
+    }
 
 
     public void startGame() {
+        SoundPlayer.play("background_game_sound.wav");
+        GameLogger.getInstance().log(" Game Started ");
         isRunning.set(true);
+
         for (Enemy e : enemies) {
             scheduleEnemy(e, 500 + random.nextInt(1001));
         }
+
+        WorldEventSchedualer.scheduleAtFixedRate(() -> {
+            gameEvent();
+        }, 40, 40, TimeUnit.SECONDS);
+    }
+
+
+    public boolean wasGameEvent() {
+        if (lastEvent) {
+            lastEvent = false;
+            return true;
+        }
+        return false;
     }
 
     private void scheduleEnemy(Enemy e, long delayMs) {
@@ -112,6 +151,7 @@ public class GameWorld {
     public void stopGame() {
         isRunning.set(false);
         ses.shutdown();
+        WorldEventSchedualer.shutdownNow();
         try {
             if (!ses.awaitTermination(2, TimeUnit.SECONDS)) {
                 ses.shutdownNow();
@@ -120,6 +160,8 @@ public class GameWorld {
             ses.shutdownNow();
             Thread.currentThread().interrupt();
         }
+
+        GameLogger.getInstance().log(" Game ended ");
     }
 
     public boolean isRunning() {
@@ -163,11 +205,14 @@ public class GameWorld {
             SoundPlayer.play("treasure-sound.wav");
         }
 
+        GameLogger.getInstance().log(player.getName() + " picked up " + item.getDisplaySymbol() + " at " + item.getPosition());
+
         lastActionPos = item.getPosition();
         lastAction    = Action.PICKUP;
         notifyObservers();
         return true;
     }
+
 
     public void useItem(GameItem item) {
         if (item == null) return;
@@ -188,8 +233,15 @@ public class GameWorld {
             lastActionPos = player.getPosition();
             lastAction    = Action.PICKUP;
             notifyObservers();
-        } else {
+
+
+            GameLogger.getInstance().log(player.getName() + " used potion " + item.getDisplaySymbol() + " at " + player.getPosition());
+        }
+
+
+        else {
             System.out.println("Can't use " + item.getDisplaySymbol());
+            GameLogger.getInstance().log(player.getName() + " failed to use " + item.getDisplaySymbol());
         }
     }
 
@@ -197,6 +249,8 @@ public class GameWorld {
         if (!worldLock.tryLock()) return;
         try {
         PlayerCharacter player = players.get(0);
+
+        GameLogger.getInstance().log(player.getName() + " attacked " + enemy.getDisplaySymbol() + " at " + enemy.getPosition());
 
 
         switch (player.getClass().getSimpleName()) {
@@ -218,9 +272,18 @@ public class GameWorld {
             else if (enemy instanceof Dragon) SoundPlayer.play("dragon_attack.wav");
         }
 
+        if(enemy.isDead()) {
+            GameLogger.getInstance().log(enemy.getDisplaySymbol() + " died after attack by " + player.getName());
+        }
+        else {
+            GameLogger.getInstance().log(enemy.getDisplaySymbol() + " has " + enemy.getHealth() + " HP remaining ");
+        }
+
+
         if (player.isDead()) {
-            System.out.println("Game Over! " + player.getName() + " was defeated.");
+            System.out.println("Game Over! " + player.getName() + " was defeated. ");
             SoundPlayer.play("game_over.wav");
+            GameLogger.getInstance().log(player.getName() + " died during combat ");
             notifyObservers();
             return;
         }
@@ -229,12 +292,14 @@ public class GameWorld {
         if (enemy.isDead()) {
             System.out.println(enemy.enemyDiscription() + " defeated!");
             SoundPlayer.play("enemy_die.wav");
+            GameLogger.getInstance().log(enemy.getDisplaySymbol() + " was defeated by " + player.getName());
             Treasure loot = enemy.defeat();
             loot.setVisible(true);
             map.removeEntity(enemy);
             enemies.remove(enemy);
             map.addEntity(enemy.getPosition(), loot);
             items.add(loot);
+            GameLogger.getInstance().log(" Loot " + loot.getDisplaySymbol() + " appeared at " + loot.getPosition());
         }
 
         map.revealNearby(player.getPosition());
@@ -265,6 +330,7 @@ public class GameWorld {
 
             boolean moved = map.moveEntity(player, dir);
             if (moved) {
+                GameLogger.getInstance().log(player.getName() + " moved from " + from + " to " + to);
                 lastActionPos = to;
                 lastAction = Action.MOVE;
                 map.revealNearby(player.getPosition());
@@ -275,6 +341,54 @@ public class GameWorld {
 
         } finally {
             worldLock.unlock();
+        }
+    }
+
+
+    private void pwrMagicWave() {
+
+        System.out.println("A power wave occurs and empowers everyone!");
+
+        Random rand = new Random();
+        int powerGiven = rand.nextInt(11) + 5;
+
+
+
+        for (PlayerCharacter player: players) {
+            if (!player.isDead()) {
+                int playerPower = player.getPower() + powerGiven;
+                player.setPower(playerPower);
+            }
+        }
+
+        for (Enemy enemy: enemies) {
+            if (!enemy.isDead()) {
+                int enemyPower = enemy.getPower() + powerGiven;
+                enemy.setPower(enemyPower);
+            }
+        }
+
+    }
+
+
+
+    private void dmgMagicWave() {
+
+        System.out.println("A magic wave occurs and damages everyone!");
+
+        Random rand = new Random();
+        int waveDMG = rand.nextInt(11) + 5; // between 5 - 15
+
+        for (PlayerCharacter player: players) {
+            if (!player.isDead()) {
+                player.takeDamage(waveDMG);
+            }
+        }
+
+        for (Enemy enemy: enemies) {
+            if (!enemy.isDead()) {
+                enemy.takeDamage(waveDMG);
+            }
         }
     }
 

@@ -5,10 +5,12 @@ import game.Model.engine.GameWorld;
 import game.Model.items.Potion;
 import game.Model.items.PowerPotion;
 import game.Model.items.Wall;
+import game.Util.GameLogger;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+
 
 
 
@@ -196,7 +198,10 @@ public class GameMap {
         for (Map.Entry<Position, List<GameEntity>> entry : grid.entrySet()) {
             if (pos.distanceTo(entry.getKey()) <= 2) {
                 for (GameEntity entity : entry.getValue()) {
-                    entity.setVisible(true);
+                    if (!entity.getVisible()) {
+                        GameLogger.getInstance().log(" Revealed " + entity.getDisplaySymbol() + " at " + entry.getKey());
+                        entity.setVisible(true);
+                    }
                 }
             }
         }
@@ -214,9 +219,6 @@ public class GameMap {
             if (entity == null || direction == null || entity.getPosition() == null) {
                 return false;
             }
-            if (!(entity instanceof PlayerCharacter)) {
-                return false;
-            }
 
             Position current = entity.getPosition();
             Position next = switch (direction.toLowerCase()) {
@@ -228,24 +230,33 @@ public class GameMap {
             };
             if (next == null) {
                 System.out.println("Invalid direction: " + direction);
+                GameLogger.getInstance().log(entity.getDisplaySymbol() + " tried to move in invalid direction " + direction + " from " + current);
                 return false;
             }
 
             if (next.getRow() < 0 || next.getRow() >= row ||
                     next.getCol() < 0 || next.getCol() >= col) {
                 System.out.println("Cannot move " + direction + ": outside map bounds!");
+                GameLogger.getInstance().log(entity.getDisplaySymbol() + " tried to move " + direction + " from " + current + " but hit map boundary ");
                 return false;
             }
 
             for (GameEntity e : getEntities(next)) {
                 if (e instanceof Wall || e instanceof Enemy) {
                     System.out.println("That space is blocked!");
+                    GameLogger.getInstance().log(entity.getDisplaySymbol() + " tried to move " + direction + " from " + current + " but was blocked by " + e.getDisplaySymbol() + " at " + next);
                     return false;
                 }
             }
 
             removeEntity(entity);
-            return addEntity(next, entity);
+
+            boolean added = addEntity(next, entity);
+            if (added) {
+                GameLogger.getInstance().log(entity.getDisplaySymbol() + " moved from " + current + " to " + next);
+            }
+
+            return added;
         }
         finally {
             unlockMap();

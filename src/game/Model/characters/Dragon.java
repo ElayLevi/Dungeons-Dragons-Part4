@@ -232,7 +232,7 @@ public class Dragon extends Enemy implements MeleeFighter, PhysicalAttacker, Ran
         int attackeRange = 2;
 
         if (distance <= attackeRange) {
-            getWorld().attack(this);
+            //getWorld().attack(this);
         }
         else {
             Random rand = new Random();

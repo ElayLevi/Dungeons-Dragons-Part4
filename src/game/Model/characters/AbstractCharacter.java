@@ -182,5 +182,10 @@ public abstract class AbstractCharacter implements Combatant, GameEntity {
         this.visible = visible;
     }
 
+
+    public void takeDamage (int dmg) {
+        this.health -= dmg;
+    }
+
 }
 

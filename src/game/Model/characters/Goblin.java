@@ -153,34 +153,25 @@ public class Goblin extends Enemy implements MeleeFighter, PhysicalAttacker {
 
     public void enemyAction() {
 
+        PlayerCharacter player = getWorld().getPlayers().get(0);
+        Position playerPos = player.getPosition();
+        Position myPos = getPosition();
 
-            PlayerCharacter player = getWorld().getPlayers().get(0);
-            Position playerPos = player.getPosition();
-            Position myPos = getPosition();
-            int distance = myPos.distanceTo(playerPos);
-            int attackeRange = 1;
-
-            if (distance <= attackeRange) {
-                getWorld().attack(this);
+        Random rand = new Random();
+        if (rand.nextInt(100)<20) {
+            int dRow = Integer.compare(playerPos.getRow(), myPos.getRow());
+            int dCol = Integer.compare(playerPos.getCol(), myPos.getCol());
+            String direction;
+            if (Math.abs(playerPos.getRow() - myPos.getRow()) > Math.abs(playerPos.getCol() - myPos.getCol())) {
+                direction = dRow > 0 ? "down" : "up";
             }
             else {
-                Random rand = new Random();
-                if (rand.nextInt(100)<20) {
-                    int dRow = Integer.compare(playerPos.getRow(), myPos.getRow());
-                    int dCol = Integer.compare(playerPos.getCol(), myPos.getCol());
-                    String direction;
-                    if (Math.abs(playerPos.getRow() - myPos.getRow()) > Math.abs(playerPos.getCol() - myPos.getCol())) {
-                        direction = dRow > 0 ? "down" : "up";
-                    }
-                    else {
-                        direction = dCol > 0 ? "right" : "left";
-                    }
-                    if (getWorld().getMap().moveEntity(this, direction)) {
-                        getWorld().notifyObservers();
-                    }
-                }
+                direction = dCol > 0 ? "right" : "left";
             }
-
+            if (getWorld().getMap().moveEntity(this, direction)) {
+                getWorld().notifyObservers();
+            }
+        }
 
     }
 }

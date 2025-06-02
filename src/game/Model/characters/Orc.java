@@ -173,7 +173,7 @@ public class Orc extends Enemy implements PhysicalAttacker , MeleeFighter {
         int attackeRange = 1;
 
         if (distance <= attackeRange) {
-            getWorld().attack(this);
+            //getWorld().attack(this);
         }
         else {
             Random rand = new Random();
