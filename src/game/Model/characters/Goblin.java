@@ -92,6 +92,7 @@ public class Goblin extends Enemy implements MeleeFighter, PhysicalAttacker {
         fightClose(target);
     }
 
+
     /**
      * checks if the combatant has an element, for example for a warrior return null
      */

@@ -1,4 +1,5 @@
 package game.Model.map;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,9 @@ import java.util.Objects;
  * <p>
  * Distance is calculated using the Manhattan method.
  */
-public class Position {
+public class Position implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private int row;
     private int col;

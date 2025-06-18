@@ -47,11 +47,6 @@ public class GameController {
         }
     }
 
-
-
-
-
-
     public void onRightClick(Position pos) {
         System.out.println("Info requested at " + pos);
     }

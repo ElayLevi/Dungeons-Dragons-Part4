@@ -19,7 +19,6 @@ public interface MagicAttacker {
      * casts a spell on a target
      * @param target the combatant who receives the spell
      */
-    void castSpell(Combatant target);
 
     /**
      *  returns the type of element of the attacker

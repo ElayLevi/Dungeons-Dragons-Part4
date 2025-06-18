@@ -75,7 +75,6 @@ public class Dragon extends Enemy implements MeleeFighter, PhysicalAttacker, Ran
      * casts a spell
      * @param target the combatant who receives the spell
      */
-    @Override
     public void castSpell(Combatant target) {
         calculateMagicDamage(target);
     }

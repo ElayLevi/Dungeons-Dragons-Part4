@@ -187,5 +187,19 @@ public abstract class AbstractCharacter implements Combatant, GameEntity {
         this.health -= dmg;
     }
 
+    /**
+     * Sets the evasion chance for the character.
+     *
+     * @param evasionChance The new evasion chance (0.0 to 1.0)
+     */
+    public void setEvasionChance(double evasionChance) {
+        if (evasionChance >= 0.0 && evasionChance <= 1.0) {
+            this.evasionChance = evasionChance;
+        }
+    }
+
+    public abstract void attack(Combatant target);
+
+
 }
 

@@ -2,10 +2,13 @@ package game.Model.map;
 import game.Model.characters.*;
 import game.Model.core.GameEntity;
 import game.Model.engine.GameWorld;
+import game.Model.items.GameItem;
 import game.Model.items.Potion;
 import game.Model.items.PowerPotion;
 import game.Model.items.Wall;
 import game.Util.GameLogger;
+
+import javax.swing.text.html.parser.Entity;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -48,9 +51,8 @@ public class GameMap {
     private ReentrantLock mapLock = new ReentrantLock(true);
 
 
-    /**
-     * Constructs an empty GameMap.
-     */
+    // In your GameMap.java, update the constructor:
+
     public GameMap(int row, int col, PlayerCharacter player, GameWorld world) {
         if (row < 10 || col < 10) {
             throw new IllegalArgumentException("Map must be at least 10x10");
@@ -69,33 +71,26 @@ public class GameMap {
                 if (roll < 0.4) {
                     continue;
                 } else if (roll < 0.7) {
-                    Enemy enemy = switch (rand.nextInt(3)) {
-                        case 0 -> new Goblin(world);
-                        case 1 -> new Orc(world);
-                        default -> new Dragon(world);
-                    };
-
-                    enemy.setPosition(pos);
-                    world.getEnemies().add(enemy);
-                    addEntity(pos,enemy);
-
+                    continue; // Skip enemy creation here
                 } else if (roll < 0.8) {
                     // 10% chance to add a wall
-                    addEntity(pos, new Wall(pos)); // assumes Wall also takes Position
+                    addEntity(pos, new Wall(pos));
                 } else {
                     // 20% chance to add potion
                     double potionType = rand.nextDouble();
                     GameEntity potion;
                     if (potionType < 0.75) {
-                        potion = new Potion(pos); // Position-based constructor
+                        potion = new Potion(pos);
                     } else {
-                        potion = new PowerPotion(pos); // Position-based constructor
+                        potion = new PowerPotion(pos);
                     }
                     addEntity(pos, potion);
+                    world.getItems().add((GameItem)potion); // Add to world's item list
                 }
             }
         }
 
+        // Place player
         Position playerPosition;
         do {
             int r = rand.nextInt(row);
@@ -104,9 +99,7 @@ public class GameMap {
         } while (!isPositionFree(playerPosition));
 
         addEntity(playerPosition, player);
-
         revealNearby(playerPosition);
-
     }
 
     private boolean tryLockMap(long timeoutMS) {
@@ -282,6 +275,21 @@ public class GameMap {
             return (boolean) method.invoke(entity);
         } catch (Exception e) {
             return false;
+        }
+    }
+    /**
+     * Completely wipes the board, removing every entity.
+     * Used by restoreState(...) to start from a clean slate.
+     */
+    public void clearAll() {
+        if (!tryLockMap(200)) return;
+        try {
+            // clear every cell (keeping the same Position→List keys)…
+            for (List<GameEntity> cell : grid.values()) {
+                cell.clear();
+            }
+        } finally {
+            unlockMap();
         }
     }
 

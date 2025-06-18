@@ -153,4 +153,7 @@ public abstract class GameItem implements GameEntity {
      */
     public abstract boolean pickUp(PlayerCharacter c);
 
+    public boolean isVisible() {
+        return this.visible;
+    }
 }

@@ -78,9 +78,11 @@ public class Mage extends PlayerCharacter implements MagicAttacker, RangedFighte
      * @param target the combatant who receives the spell
      */
     @Override
-    public void castSpell(Combatant target) {
+    public void attack(Combatant target) {
         calculateMagicDamage(target);
     }
+
+
 
 
     /**
@@ -116,7 +118,7 @@ public class Mage extends PlayerCharacter implements MagicAttacker, RangedFighte
     @Override
     public void fightRanged(Combatant target) {
         if (isInRange(getPosition(), target.getPosition())) {
-            castSpell(target);
+            attack(target);
         }
     }
 

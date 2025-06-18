@@ -105,6 +105,7 @@ public abstract class PlayerCharacter extends AbstractCharacter {
     }
 
 
+
     /**
      * represents the class as string.
      */
