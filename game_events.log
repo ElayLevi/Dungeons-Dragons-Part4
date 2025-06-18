@@ -1,0 +1,109 @@
+[2025-06-18 22:21:24] Invalid health modification: -100. Must be between -2 and +3
+[2025-06-18 22:21:24] Invalid power modification: -9. Must be between -2 and +3
+[2025-06-18 22:21:24] Invalid evasion modification: -125%. Must be between -2% and +3%
+[2025-06-18 22:21:24] Built Mage named ori with Health=100, Power=10, Evasion=0.25
+[2025-06-18 22:21:28] ori gained Boosted Attack!
+[2025-06-18 22:21:28] Applied Boosted Attack to ori
+[2025-06-18 22:21:28] ori gained Magic Amplifier!
+[2025-06-18 22:21:28] Applied Magic Amplifier to ori
+[2025-06-18 22:21:31]  Revealed + at row: 4column: 5
+[2025-06-18 22:21:31]  Revealed + at row: 2column: 6
+[2025-06-18 22:21:31]  Revealed P at row: 3column: 3
+[2025-06-18 22:21:31]  Revealed + at row: 3column: 7
+[2025-06-18 22:21:31] Created Goblin at row: 0column: 6
+[2025-06-18 22:21:31] Created Goblin at row: 6column: 8
+[2025-06-18 22:21:31] Created Orc at row: 5column: 0
+[2025-06-18 22:21:31] Created Orc at row: 5column: 4
+[2025-06-18 22:21:31] Created Goblin at row: 7column: 1
+[2025-06-18 22:21:31] Created Dragon at row: 2column: 4
+[2025-06-18 22:21:31] Created Orc at row: 1column: 4
+[2025-06-18 22:21:31] Created Orc at row: 1column: 3
+[2025-06-18 22:21:31] Created Goblin at row: 0column: 3
+[2025-06-18 22:21:31] Created Dragon at row: 5column: 7
+[2025-06-18 22:21:31] Created Goblin at row: 2column: 2
+[2025-06-18 22:21:31] Created Dragon at row: 8column: 6
+[2025-06-18 22:21:31] Created Orc at row: 1column: 9
+[2025-06-18 22:21:31] Created Goblin at row: 7column: 6
+[2025-06-18 22:21:31] Created Goblin at row: 1column: 7
+[2025-06-18 22:21:31] Created Dragon at row: 1column: 6
+[2025-06-18 22:21:31] Created Orc at row: 9column: 7
+[2025-06-18 22:21:31] Created Orc at row: 8column: 4
+[2025-06-18 22:21:31] Created Goblin at row: 2column: 5
+[2025-06-18 22:21:31] Created Orc at row: 9column: 3
+[2025-06-18 22:21:31] Initialized 20 enemies on the map
+[2025-06-18 22:21:31] Game Started
+[2025-06-18 22:21:31] Game Started
+[2025-06-18 22:21:32] O tried to move right from row: 1column: 3 but was blocked by O at row: 1column: 4
+[2025-06-18 22:21:32] O moved from row: 5column: 4 to row: 4column: 4
+[2025-06-18 22:21:32] O tried to move right from row: 1column: 3 but was blocked by O at row: 1column: 4
+[2025-06-18 22:21:32] O moved from row: 9column: 3 to row: 8column: 3
+[2025-06-18 22:21:32] G moved from row: 7column: 1 to row: 7column: 2
+[2025-06-18 22:21:32] G moved from row: 7column: 2 to row: 6column: 2
+[2025-06-18 22:21:32] G tried to move down from row: 0column: 3 but was blocked by O at row: 1column: 3
+[2025-06-18 22:21:33] G tried to move left from row: 1column: 7 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:33] O tried to move down from row: 1column: 4 but was blocked by D at row: 2column: 4
+[2025-06-18 22:21:33] O moved from row: 8column: 4 to row: 7column: 4
+[2025-06-18 22:21:33] G moved from row: 7column: 6 to row: 6column: 6
+[2025-06-18 22:21:33] G tried to move right from row: 2column: 2 but was blocked by # at row: 2column: 3
+[2025-06-18 22:21:33] G tried to move down from row: 0column: 3 but was blocked by O at row: 1column: 3
+[2025-06-18 22:21:33] O moved from row: 1column: 9 to row: 1column: 8
+[2025-06-18 22:21:33] G tried to move down from row: 0column: 3 but was blocked by O at row: 1column: 3
+[2025-06-18 22:21:33] D moved from row: 8column: 6 to row: 7column: 6
+[2025-06-18 22:21:33] G moved from row: 6column: 2 to row: 6column: 3
+[2025-06-18 22:21:33] O tried to move right from row: 1column: 3 but was blocked by O at row: 1column: 4
+[2025-06-18 22:21:33] G moved from row: 6column: 8 to row: 6column: 7
+[2025-06-18 22:21:34] G moved from row: 6column: 6 to row: 5column: 6
+[2025-06-18 22:21:34] G tried to move down from row: 0column: 6 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:34] G moved from row: 6column: 3 to row: 5column: 3
+[2025-06-18 22:21:34] O tried to move right from row: 1column: 3 but was blocked by O at row: 1column: 4
+[2025-06-18 22:21:34] O moved from row: 5column: 0 to row: 5column: 1
+[2025-06-18 22:21:34] G tried to move up from row: 6column: 7 but was blocked by D at row: 5column: 7
+[2025-06-18 22:21:35] G tried to move left from row: 1column: 7 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:35] G tried to move down from row: 0column: 3 but was blocked by O at row: 1column: 3
+[2025-06-18 22:21:35] G tried to move left from row: 1column: 7 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:35] G moved from row: 5column: 3 to row: 5column: 4
+[2025-06-18 22:21:35] O moved from row: 5column: 1 to row: 5column: 2
+[2025-06-18 22:21:35] O moved from row: 7column: 4 to row: 6column: 4
+[2025-06-18 22:21:35] G tried to move down from row: 0column: 6 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:36] O tried to move right from row: 1column: 3 but was blocked by O at row: 1column: 4
+[2025-06-18 22:21:36] G moved from row: 2column: 5 to row: 3column: 5
+[2025-06-18 22:21:36] D moved from row: 7column: 6 to row: 6column: 6
+[2025-06-18 22:21:36] O moved from row: 8column: 3 to row: 7column: 3
+[2025-06-18 22:21:36] G tried to move right from row: 2column: 2 but was blocked by # at row: 2column: 3
+[2025-06-18 22:21:37] O tried to move left from row: 1column: 8 but was blocked by G at row: 1column: 7
+[2025-06-18 22:21:37] G moved from row: 5column: 6 to row: 4column: 6
+[2025-06-18 22:21:37] G tried to move down from row: 0column: 3 but was blocked by O at row: 1column: 3
+[2025-06-18 22:21:37] O moved from row: 7column: 3 to row: 6column: 3
+[2025-06-18 22:21:37] G tried to move left from row: 1column: 7 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:37] O moved from row: 6column: 3 to row: 5column: 3
+[2025-06-18 22:21:37] G moved from row: 3column: 5 to row: 3column: 4
+[2025-06-18 22:21:38] G tried to move up from row: 6column: 7 but was blocked by D at row: 5column: 7
+[2025-06-18 22:21:38] D moved from row: 5column: 7 to row: 5column: 6
+[2025-06-18 22:21:38] G tried to move down from row: 0column: 6 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:38] G tried to move down from row: 0column: 3 but was blocked by O at row: 1column: 3
+[2025-06-18 22:21:38] O moved from row: 4column: 4 to row: 4column: 5
+[2025-06-18 22:21:39] G moved from row: 5column: 4 to row: 4column: 4
+[2025-06-18 22:21:39] O tried to move right from row: 1column: 3 but was blocked by O at row: 1column: 4
+[2025-06-18 22:21:39] G tried to move down from row: 0column: 6 but was blocked by D at row: 1column: 6
+[2025-06-18 22:21:39] G tried to move left from row: 4column: 6 but was blocked by O at row: 4column: 5
+[2025-06-18 22:21:39] O tried to move left from row: 1column: 8 but was blocked by G at row: 1column: 7
+[2025-06-18 22:21:39] G moved from row: 6column: 7 to row: 5column: 7
+[2025-06-18 22:21:39] G tried to move right from row: 4column: 4 but was blocked by O at row: 4column: 5
+[2025-06-18 22:21:40] O tried to move down from row: 1column: 4 but was blocked by D at row: 2column: 4
+[2025-06-18 22:21:40] D moved from row: 1column: 6 to row: 2column: 6
+[2025-06-18 22:21:40] O moved from row: 6column: 4 to row: 5column: 4
+[2025-06-18 22:21:40] G tried to move right from row: 2column: 2 but was blocked by # at row: 2column: 3
+[2025-06-18 22:21:40] G moved from row: 0column: 6 to row: 1column: 6
+[2025-06-18 22:21:40] G tried to move left from row: 4column: 6 but was blocked by O at row: 4column: 5
+[2025-06-18 22:21:40] G moved from row: 3column: 4 to row: 3column: 5
+[2025-06-18 22:21:40] G tried to move left from row: 5column: 7 but was blocked by D at row: 5column: 6
+[2025-06-18 22:21:41] O tried to move down from row: 1column: 4 but was blocked by D at row: 2column: 4
+[2025-06-18 22:21:41] O tried to move right from row: 1column: 3 but was blocked by O at row: 1column: 4
+[2025-06-18 22:21:41] G moved from row: 3column: 5 to row: 3column: 4
+[2025-06-18 22:21:41] O tried to move up from row: 5column: 4 but was blocked by G at row: 4column: 4
+[2025-06-18 22:21:41] G tried to move down from row: 0column: 3 but was blocked by O at row: 1column: 3
+[2025-06-18 22:21:41] O tried to move down from row: 1column: 4 but was blocked by D at row: 2column: 4
+[2025-06-18 22:21:41] D tried to move up from row: 6column: 6 but was blocked by D at row: 5column: 6
+[2025-06-18 22:21:41] D tried to move up from row: 5column: 6 but was blocked by G at row: 4column: 6
+[2025-06-18 22:21:42] Game Ended
+[2025-06-18 22:21:42] Game Ended
